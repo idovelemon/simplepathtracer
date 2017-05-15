@@ -51,3 +51,6 @@ spt/Debug/spt.pdb
 spt/Debug/spt.ilk
 *.idb
 *.bmp
+*.sdf
+spt/spt.opensdf
+*.sdf

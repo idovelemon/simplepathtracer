@@ -23,14 +23,25 @@ public:
     virtual~ World();
 
 public:
+    void SetMaxDepth(int32_t depth);
+    int32_t GetMaxDepth() const;
+
+    void SetEnvLightColor(Vector3 color);
+    Vector3 GetEnvLightColor() const;
+
     void AddObject(Object* obj);
     void AddLight(AreaLight* light);
+
     ShadeBlock PrimaryTrace(const Ray& r);
+    ShadeBlock SecondaryTrace(const Ray& r, const ShadeBlock& pre);
+
     bool IsTwoPointVisible(Vector3 p0, Vector3 p1);
 
     std::vector<AreaLight*>& GetAreaLights();
 
 private:
+    int32_t                     m_MaxDepth;
+    Vector3                     m_EnvLightColor;
     std::vector<Object*>        m_Objects;
     std::vector<AreaLight*>     m_AreaLights;
 };

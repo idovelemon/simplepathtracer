@@ -7,6 +7,7 @@
 #include "sptsampler.h"
 
 #include <math.h>
+#include <time.h>
 #include <vector>
 
 #include "sptutil.h"
@@ -28,10 +29,12 @@ Sampler::~Sampler() {
 
 void Sampler::GenSamplers() {
     float t = sqrt(1.0f * m_SamplerNum);
-    if (abs(t - floor(t)) > 0.0001f)
+    if (abs(t - floor(t)) > 0.0001f) {
+        printf("Error: Sampler number must be squre\n");
         return;
+    }
 
-    float step = 1.0 / m_SamplerNum;
+    float step = 1.0f / m_SamplerNum;
         
     std::vector<std::vector<int32_t>> col_lists;
     std::vector<std::vector<int32_t>> row_lists;
@@ -59,6 +62,16 @@ void Sampler::GenSamplers() {
             row_lists[i].erase(std::find(row_lists[i].begin(), row_lists[i].end(), row));
         }
     }
+}
+
+Vector2 Sampler::GenSamplerInHemiSphere() {
+    Vector2 sampler;
+    sampler.x = rand() % 100 / 100.0f;
+    sampler.y = rand() % 100 / 100.0f;
+    sampler.x = 2 * 3.141592f * sampler.x;
+    float t = pow(1 - sampler.y, 0.5f);
+    sampler.y = acos(t);
+    return sampler;
 }
 
 void Sampler::MapToDisk() {
@@ -96,6 +109,14 @@ void Sampler::MapToDisk() {
         m_Samplers[i].y = r * sin(phi);
         m_Samplers[i].x = (m_Samplers[i].x + 1.0f) * 0.5f;
         m_Samplers[i].y = (m_Samplers[i].y + 1.0f) * 0.5f;
+    }
+}
+
+void Sampler::MapToHemiSphere() {
+    for (int32_t i = 0; i < m_SamplerNum; i++) {
+        m_Samplers[i].x = 2 * 3.141592f * m_Samplers[i].x;
+        float t = pow(1 - m_Samplers[i].y, 0.5f);
+        m_Samplers[i].y = acos(t);
     }
 }
 

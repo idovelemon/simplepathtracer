@@ -41,18 +41,24 @@ inline void SetRGB(float* buf,
     buf[y * width * 3 + x * 3 + 2] = b;
 }
 
+inline void ToneMapping(float& x, float& y, float& z) {
+    x = x / (1.0f + x);
+    y = y / (1.0f + y);
+    z = z / (1.0f + z);
+}
+
 inline void SaveToBmpFile(float* buf, int32_t width, int32_t height, const char* name) {
     if (buf == NULL || name == NULL) return;
 
     FILE* file = fopen(name, "wb");
 
     if (file) {
-        int8_t* image_buf = new int8_t[width * height * 3];
+        uint8_t* image_buf = new uint8_t[width * height * 3];
         for (int32_t y = 0; y < height; y++) {
             for (int32_t x = 0; x < width; x++) {
-                int8_t r = floor(buf[y * width * 3 + x * 3 + 0] * 255);
-                int8_t g = floor(buf[y * width * 3 + x * 3 + 1] * 255);
-                int8_t b = floor(buf[y * width * 3 + x * 3 + 2] * 255);
+                uint8_t r = buf[y * width * 3 + x * 3 + 0] * 255;
+                uint8_t g = buf[y * width * 3 + x * 3 + 1] * 255;
+                uint8_t b = buf[y * width * 3 + x * 3 + 2] * 255;
 
                 // Bitmap's color format is BGR
                 image_buf[y * width * 3 + x * 3 + 0] = b;

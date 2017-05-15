@@ -22,9 +22,10 @@ public:
     virtual ~ShadeBlock();
 
 public:
-    Vector3 Shade();
+    Vector3 Shade(int32_t sampler_index);
 
     void SetDepth(int32_t depth);
+    int32_t GetDepth() const;
     void SetPos(Vector3 pos);
     void SetNormal(Vector3 normal);
     void SetObject(Object* obj);
@@ -32,7 +33,7 @@ public:
 
 protected:
     Vector3 Direct();
-    Vector3 InDirect();
+    Vector3 InDirect(int32_t sampler_index);
 
 private:
     int32_t         m_Depth;

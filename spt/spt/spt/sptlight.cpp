@@ -24,7 +24,7 @@ AreaLight::~AreaLight() {
     m_Object = 0;
 }
 
-float AreaLight::GetPDF() {
+float AreaLight::GetPDF() const {
     float pdf = 0.0f;
 
     // Only support disk area light now
@@ -36,13 +36,25 @@ float AreaLight::GetPDF() {
     return pdf;
 }
 
-Vector3 AreaLight::GetLightColor() {
+Vector3 AreaLight::GetLightColor() const {
     Vector3 result(0.0f, 0.0f, 0.0f);
 
     // Must be emission material
     if (m_Object->GetMaterial()->GetType() == Material::EMISSION) {
         Emission* emission = reinterpret_cast<Emission*>(m_Object->GetMaterial());
         result = emission->GetCe() * emission->GetKe();
+    }
+
+    return result;
+}
+
+Vector3 AreaLight::GetLightDir() const {
+    Vector3 result(0.0f, 0.0f, 0.0f);
+
+    // Only support disk area light now
+    if (m_Object->GetShape()->GetType() == Shape::DISK) {
+        Disk* disk = reinterpret_cast<Disk*>(m_Object->GetShape());
+        result = disk->GetNormal();
     }
 
     return result;

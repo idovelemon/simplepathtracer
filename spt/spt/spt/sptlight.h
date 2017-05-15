@@ -20,8 +20,9 @@ public:
     virtual ~AreaLight();
 
 public:
-    float GetPDF();
-    Vector3 GetLightColor();
+    float GetPDF() const;
+    Vector3 GetLightColor() const;
+    Vector3 GetLightDir() const;
     Sampler* GetSampler();
     Vector3 CalcPointLightPos(Vector2 sampler);
 

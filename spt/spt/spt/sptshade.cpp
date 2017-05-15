@@ -29,20 +29,23 @@ ShadeBlock::~ShadeBlock() {
     m_World = 0;
 }
 
-Vector3 ShadeBlock::Shade() {
-    if (m_Object == 0) return Vector3(0.0f, 0.0f, 0.0f);
+Vector3 ShadeBlock::Shade(int32_t sampler_index) {
+    // Out condition: No object has been traced
+    if (m_Object == 0) return m_World->GetEnvLightColor();
 
     Vector3 result_color(0.0f, 0.0f, 0.0f);
 
     if (m_Object->GetMaterial()->GetType() == Material::EMISSION) {
-        // Emission
-        Emission* emission = reinterpret_cast<Emission*>(m_Object->GetMaterial());
-        result_color = emission->GetCe() * emission->GetKe();
-        return result_color;
+        if (m_Depth != 2) { // Because we demostrate this with direct lighting from area light
+            // Emission
+            Emission* emission = reinterpret_cast<Emission*>(m_Object->GetMaterial());
+            result_color = emission->GetCe() * emission->GetKe();
+            return result_color;
+        }
     } else {
         // None-Emission
         Vector3 result_direct = Direct();
-        Vector3 result_indirect = InDirect();
+        Vector3 result_indirect = InDirect(sampler_index);
         result_color = result_direct + result_indirect;
     }
 
@@ -51,6 +54,10 @@ Vector3 ShadeBlock::Shade() {
 
 void ShadeBlock::SetDepth(int32_t depth) {
     m_Depth = depth;
+}
+
+int32_t ShadeBlock::GetDepth() const {
+    return m_Depth;
 }
 
 void ShadeBlock::SetPos(Vector3 pos) {
@@ -87,19 +94,23 @@ Vector3 ShadeBlock::Direct() {
         Vector2* samplers = light->GetSampler()->GetSamplers();
         for (int32_t j = 0; j < sampler_num; j++) {
             Vector3 pos = light->CalcPointLightPos(samplers[j]);
-            if (m_World->IsTwoPointVisible(m_Pos, pos)) {
-                Vector3 brdf = m_Object->GetMaterial()->GetBRDF();
+            Vector3 ld = m_Pos - pos;
+            ld.Normalize();
+            if (Vector3::Dot(light->GetLightDir(), ld) > 0.0f) {
+                if (m_World->IsTwoPointVisible(m_Pos, pos)) {
+                    Vector3 brdf = m_Object->GetMaterial()->GetBRDF();
 
-                Vector3 l = pos - m_Pos;
-                float squre_length = l.SqureLength();
-                l.Normalize();
-                float cos = Vector3::Dot(l, m_Normal);
-                cos = (0.0f > cos) ? 0.0f : cos;
+                    Vector3 l = pos - m_Pos;
+                    float squre_length = l.SqureLength();
+                    l.Normalize();
+                    float cos = Vector3::Dot(l, m_Normal);
+                    cos = (0.0f > cos) ? 0.0f : cos;
 
-                Vector3 out_light = brdf * lc * cos;  // Reflection Equation
-                out_light = out_light * (1.0f / squre_length);  // Distance Attenuation
-                Vector3 result_point_light_color = out_light * (1.0f / pdf);  // Monte Carlo Integration-Step1
-                result_area_light_color = result_area_light_color + result_point_light_color;
+                    Vector3 out_light = brdf * lc * cos;  // Reflection Equation
+                    out_light = out_light * (1.0f / squre_length);  // Distance Attenuation
+                    Vector3 result_point_light_color = out_light * (1.0f / pdf);  // Monte Carlo Integration-Step1
+                    result_area_light_color = result_area_light_color + result_point_light_color;
+                }
             }
         }
 
@@ -110,8 +121,24 @@ Vector3 ShadeBlock::Direct() {
     return result_color;
 }
 
-Vector3 ShadeBlock::InDirect() {
-    return Vector3(0.0f, 0.0f, 0.0f);
+Vector3 ShadeBlock::InDirect(int32_t sampler_index) {
+    // Out Condition: Meet the max recursion
+    if (m_Depth > m_World->GetMaxDepth()) {
+        return m_World->GetEnvLightColor();
+    }
+
+    // Shoot secondary ray
+    Ray ray = m_Object->GetMaterial()->GetReflectRay(m_Pos, m_Normal, sampler_index);
+    ShadeBlock shade = m_World->SecondaryTrace(ray, *this);
+
+    // Calculate the indirect light
+    Vector3 lc = shade.Shade(sampler_index);
+
+    Vector3 brdf = m_Object->GetMaterial()->GetBRDF();
+    float pdf = m_Object->GetMaterial()->GetPDF(m_Normal, ray.dir);
+    float cos = Vector3::Dot(m_Normal, ray.dir);
+    cos = (0.0f > cos) ? 0.0f : cos;
+    return brdf * lc * (cos / pdf);  // Reflection Equation
 }
 
 };  // namespace spt

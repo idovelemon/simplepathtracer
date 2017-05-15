@@ -12,11 +12,29 @@
 
 namespace spt {
 
-World::World() {
+World::World()
+: m_MaxDepth(0)
+, m_EnvLightColor(0.0f, 0.0f, 0.0f) {
     m_Objects.clear();
 }
 
 World::~World() {
+}
+
+void World::SetMaxDepth(int32_t depth) {
+    m_MaxDepth = depth;
+}
+
+int32_t World::GetMaxDepth() const {
+    return m_MaxDepth;
+}
+
+void World::SetEnvLightColor(Vector3 color) {
+    m_EnvLightColor = color;
+}
+
+Vector3 World::GetEnvLightColor() const {
+    return m_EnvLightColor;
 }
 
 void World::AddObject(Object* obj) {
@@ -50,6 +68,32 @@ ShadeBlock World::PrimaryTrace(const Ray& r) {
     }
 
     block.SetDepth(1);
+    block.SetWorld(this);
+
+    return block;
+}
+
+ShadeBlock World::SecondaryTrace(const Ray& r, const ShadeBlock& pre) {
+    ShadeBlock block;
+
+    float min = FLT_MAX;
+    Vector3 p(0.0f, 0.0f, 0.0f);
+    Vector3 n(0.0f, 0.0f, 0.0f);
+    float t = 0.0f;
+
+    int32_t size = m_Objects.size();
+    for (int32_t i = 0; i < size; i++) {
+        if (m_Objects[i]->Hit(r, p, n, t)) {
+            if (t < min) {
+                min = t;
+                block.SetPos(p);
+                block.SetNormal(n);
+                block.SetObject(m_Objects[i]);
+            }
+        }
+    }
+
+    block.SetDepth(pre.GetDepth() + 1);
     block.SetWorld(this);
 
     return block;

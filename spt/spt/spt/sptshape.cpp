@@ -113,7 +113,7 @@ Disk::Disk(Vector3 p, Vector3 n, float size, float ep)
 , m_Radius(size) {
     Vector3 up(0.0f, 1.0f, 0.0f);
 
-    if (Vector3::Dot(up, n) < 1.0f) {
+    if (abs(Vector3::Dot(up, n)) < 1.0f) {
         m_Right = Vector3::Cross(up, n);
         m_Right.Normalize();
         m_Up = Vector3::Cross(n, m_Right);
@@ -167,6 +167,10 @@ bool Disk::Hit(const Ray& r, Vector3& p, Vector3& n, float& t) {
 
 float Disk::GetArea() {
     return 3.141592f * m_Radius * m_Radius;
+}
+
+Vector3 Disk::GetNormal() {
+    return m_Normal;
 }
 
 Vector3 Disk::CalcPointLightPos(Vector2 sampler) {

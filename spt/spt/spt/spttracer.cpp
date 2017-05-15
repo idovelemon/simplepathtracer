@@ -45,13 +45,15 @@ void Tracer::Trace(int32_t start_line, int32_t end_line,
             for (int32_t j = 0; j < sampler_num; j++) {
                 Ray ray = m_Camera->GenRay(x, y, samplers[j]);
                 ShadeBlock block = m_World->PrimaryTrace(ray);
-                color = color + block.Shade();
+                color = color + block.Shade(j);
             }
             color = color * (1.0f / sampler_num);
             color.x = Clamp(color.x);
             color.y = Clamp(color.y);
             color.z = Clamp(color.z);
+            //ToneMapping(color.x, color.y, color.z);
             SetRGB(color_buf, x, y, width, height, color.x, color.y, color.z);
+            printf("Pos:(%d,%d) Color:(%f,%f,%f)\n", x, y, color.x, color.y, color.z);
         }
     }
 

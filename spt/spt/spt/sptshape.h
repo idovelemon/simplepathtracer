@@ -17,6 +17,16 @@ class Ray {
 public:
     Vector3 pos;
     Vector3 dir;
+
+    Ray()
+    : pos(0.0f, 0.0f, 0.0f)
+    , dir(0.0f, 0.0f, 0.0f) {
+    }
+
+    Ray(const Ray& r) {
+        pos = r.pos;
+        dir = r.dir;
+    }
 };
 
 //--------------------------------------------------------
@@ -71,6 +81,7 @@ public:
     virtual bool Hit(const Ray& r, Vector3& p, Vector3& n, float& t);
 
     float GetArea();
+    Vector3 GetNormal();
     Vector3 CalcPointLightPos(Vector2 sampler);
 
 protected:
