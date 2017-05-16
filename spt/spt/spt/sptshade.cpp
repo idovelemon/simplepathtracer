@@ -20,6 +20,7 @@ ShadeBlock::ShadeBlock()
 : m_Depth(0)
 , m_Pos(0.0f, 0.0f, 0.0f)
 , m_Normal(0.0f, 0.0f, 0.0f)
+, m_LightDir(0.0f, 0.0f, 0.0f)
 , m_Object(0)
 , m_World(0) {
 }
@@ -66,6 +67,10 @@ void ShadeBlock::SetPos(Vector3 pos) {
 
 void ShadeBlock::SetNormal(Vector3 normal) {
     m_Normal = normal;
+}
+
+void ShadeBlock::SetLightDir(Vector3 dir) {
+    m_LightDir = dir;
 }
 
 void ShadeBlock::SetObject(Object* obj) {
@@ -128,7 +133,7 @@ Vector3 ShadeBlock::InDirect(int32_t sampler_index) {
     }
 
     // Shoot secondary ray
-    Ray ray = m_Object->GetMaterial()->GetReflectRay(m_Pos, m_Normal, sampler_index);
+    Ray ray = m_Object->GetMaterial()->GetReflectRay(m_Pos, m_Normal, m_LightDir, sampler_index);
     ShadeBlock shade = m_World->SecondaryTrace(ray, *this);
 
     // Calculate the indirect light

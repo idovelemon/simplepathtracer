@@ -7,6 +7,7 @@
 #include "spttracer.h"
 
 #include <stdint.h>
+#include <time.h>
 #include <iostream>
 
 #include"sptcamera.h"
@@ -56,8 +57,6 @@ void Tracer::Trace(int32_t start_line, int32_t end_line,
             printf("Pos:(%d,%d) Color:(%f,%f,%f)\n", x, y, color.x, color.y, color.z);
         }
     }
-
-    std::cout << start_line;
 }
 
 };  // namespace spt

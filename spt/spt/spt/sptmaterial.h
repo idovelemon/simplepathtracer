@@ -20,6 +20,7 @@ public:
     enum {
         DIFFUSE,
         EMISSION,
+        PERFECTSPECULAR,
     };
 
 public:
@@ -30,7 +31,7 @@ public:
     int32_t GetType();
     virtual Vector3 GetBRDF() = 0;
     virtual float GetPDF(Vector3 normal, Vector3 wi) = 0;
-    virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, int32_t sampler_index) = 0;
+    virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) = 0;
 
 protected:
     int32_t     m_Type;
@@ -47,7 +48,7 @@ public:
 public:
     virtual Vector3 GetBRDF();
     virtual float GetPDF(Vector3 normal, Vector3 wi);
-    virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, int32_t sampler_index);
+    virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index);
 
 protected:
     float       m_Kd;
@@ -64,7 +65,7 @@ public:
 public:
     virtual Vector3 GetBRDF();
     virtual float GetPDF(Vector3 normal, Vector3 wi);
-    virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, int32_t sampler_index);
+    virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index);
 
     float GetKe();
     Vector3 GetCe();
@@ -72,6 +73,27 @@ public:
 protected:
     float       m_Ke;
     Vector3     m_Ce;
+};
+
+
+//----------------------------------------------------------
+
+class PerfectSpecular : public Material {
+public:
+    PerfectSpecular(float ks, Vector3 cs);
+    virtual ~PerfectSpecular();
+
+public:
+    virtual Vector3 GetBRDF();
+    virtual float GetPDF(Vector3 normal, Vector3 wi);
+    virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index);
+
+    float GetKs();
+    Vector3 GetCs();
+
+protected:
+    float       m_Ks;
+    Vector3     m_Cs;
 };
 
 };  // namespace spt

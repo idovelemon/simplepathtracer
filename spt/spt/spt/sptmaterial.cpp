@@ -45,7 +45,7 @@ float Diffuse::GetPDF(Vector3 normal, Vector3 wi) {
     return Vector3::Dot(normal, wi) / 3.141592f;
 }
 
-Ray Diffuse::GetReflectRay(Vector3 pos, Vector3 normal, int32_t sampler_index) {
+Ray Diffuse::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) {
     // Get sampler point on hemisphere
     Vector2 sample = m_Sampler.GenSamplerInHemiSphere();
 
@@ -95,7 +95,7 @@ float Emission::GetPDF(Vector3 normal, Vector3 wi) {
     return 0.0f;
 }
 
-Ray Emission::GetReflectRay(Vector3 pos, Vector3 normal, int32_t sampler_index) {
+Ray Emission::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) {
     return Ray();
 }
 
@@ -107,4 +107,39 @@ Vector3 Emission::GetCe() {
     return m_Ce;
 }
 
+//----------------------------------------------------------
+
+PerfectSpecular::PerfectSpecular(float ks, Vector3 cs)
+: Material(Material::PERFECTSPECULAR, 0)
+, m_Ks(ks)
+, m_Cs(cs) {
+}
+
+PerfectSpecular::~PerfectSpecular() {
+}
+
+Vector3 PerfectSpecular::GetBRDF() {
+    return m_Cs * m_Ks;
+}
+
+float PerfectSpecular::GetPDF(Vector3 normal, Vector3 wi) {
+    return Vector3::Dot(normal, wi);
+}
+
+Ray PerfectSpecular::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) {
+    Vector3 dir = normal * (Vector3::Dot(wi, normal) * 2.0f) - wi;
+    dir.Normalize();
+    Ray ray;
+    ray.pos = pos;
+    ray.dir = dir;
+    return ray;
+}
+
+float PerfectSpecular::GetKs() {
+    return m_Ks;
+}
+
+Vector3 PerfectSpecular::GetCs() {
+    return m_Cs;
+}
 };  // namespace spt

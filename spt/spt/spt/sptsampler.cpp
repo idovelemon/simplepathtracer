@@ -35,7 +35,7 @@ void Sampler::GenSamplers() {
     }
 
     float step = 1.0f / m_SamplerNum;
-        
+
     std::vector<std::vector<int32_t>> col_lists;
     std::vector<std::vector<int32_t>> row_lists;
     for(int32_t i = 0; i < static_cast<int32_t>(floor(t)); i++) {

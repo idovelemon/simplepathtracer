@@ -63,6 +63,7 @@ ShadeBlock World::PrimaryTrace(const Ray& r) {
                 block.SetPos(p);
                 block.SetNormal(n);
                 block.SetObject(m_Objects[i]);
+                block.SetLightDir(r.dir * (-1.0f));
             }
         }
     }
@@ -89,6 +90,7 @@ ShadeBlock World::SecondaryTrace(const Ray& r, const ShadeBlock& pre) {
                 block.SetPos(p);
                 block.SetNormal(n);
                 block.SetObject(m_Objects[i]);
+                block.SetLightDir(r.dir * (-1.0f));
             }
         }
     }
