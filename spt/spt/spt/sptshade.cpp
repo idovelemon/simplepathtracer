@@ -37,7 +37,8 @@ Vector3 ShadeBlock::Shade(int32_t sampler_index) {
     Vector3 result_color(0.0f, 0.0f, 0.0f);
 
     if (m_Object->GetMaterial()->GetType() == Material::EMISSION) {
-        if (m_Depth != 2) { // Because we demostrate this with direct lighting from area light
+        //if (m_Depth != 2) { // Because we demostrate this with direct lighting from area light
+            if (true) {
             // Emission
             Emission* emission = reinterpret_cast<Emission*>(m_Object->GetMaterial());
             result_color = emission->GetCe() * emission->GetKe();
@@ -45,9 +46,10 @@ Vector3 ShadeBlock::Shade(int32_t sampler_index) {
         }
     } else {
         // None-Emission
-        Vector3 result_direct = Direct();
+        //Vector3 result_direct = Direct();
         Vector3 result_indirect = InDirect(sampler_index);
-        result_color = result_direct + result_indirect;
+        //result_color = result_direct + result_indirect;
+        result_color = result_indirect;
     }
 
     return result_color;
@@ -128,8 +130,16 @@ Vector3 ShadeBlock::Direct() {
 
 Vector3 ShadeBlock::InDirect(int32_t sampler_index) {
     // Out Condition: Meet the max recursion
-    if (m_Depth > m_World->GetMaxDepth()) {
-        return m_World->GetEnvLightColor();
+    //if (m_Depth > m_World->GetMaxDepth()) {
+    //    return m_World->GetEnvLightColor();
+    //}
+
+    // Russian Roulette
+    Vector3 color = m_Object->GetMaterial()->GetColor();
+    float p = color.x > color.y && color.x > color.z ? color.x : color.y > color.z ? color.y : color.z;
+    if (rand() % 100 / 100.0f > p) {
+        // Terminate
+        return m_Object->GetMaterial()->GetColor();
     }
 
     // Shoot secondary ray
@@ -143,7 +153,7 @@ Vector3 ShadeBlock::InDirect(int32_t sampler_index) {
     float pdf = m_Object->GetMaterial()->GetPDF(m_Normal, ray.dir);
     float cos = Vector3::Dot(m_Normal, ray.dir);
     cos = (0.0f > cos) ? 0.0f : cos;
-    return brdf * lc * (cos / pdf);  // Reflection Equation
+    return brdf * lc * (cos / pdf / p);  // Reflection Equation
 }
 
 };  // namespace spt

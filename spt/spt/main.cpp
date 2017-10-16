@@ -16,11 +16,11 @@ int main() {
     // Setup world
     int SCREEN_WIDTH = 400;
     int SCREEN_HEIGHT = 400;
-    int AREA_SAMPLER_NUM = 36;
-    int SAMPLER_NUM = 625;
+    int AREA_SAMPLER_NUM = 25;
+    int SAMPLER_NUM = 10000;
 
     spt::World world;
-    world.SetMaxDepth(5);
+    //world.SetMaxDepth(50);
 
     // AreaLight1
     spt::Object* obj = new spt::Object();

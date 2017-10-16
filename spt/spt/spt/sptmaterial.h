@@ -32,6 +32,7 @@ public:
     virtual Vector3 GetBRDF() = 0;
     virtual float GetPDF(Vector3 normal, Vector3 wi) = 0;
     virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) = 0;
+    virtual Vector3 GetColor() = 0;
 
 protected:
     int32_t     m_Type;
@@ -49,6 +50,7 @@ public:
     virtual Vector3 GetBRDF();
     virtual float GetPDF(Vector3 normal, Vector3 wi);
     virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index);
+    virtual Vector3 GetColor();
 
 protected:
     float       m_Kd;
@@ -66,6 +68,7 @@ public:
     virtual Vector3 GetBRDF();
     virtual float GetPDF(Vector3 normal, Vector3 wi);
     virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index);
+    virtual Vector3 GetColor();
 
     float GetKe();
     Vector3 GetCe();
@@ -87,6 +90,7 @@ public:
     virtual Vector3 GetBRDF();
     virtual float GetPDF(Vector3 normal, Vector3 wi);
     virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index);
+    virtual Vector3 GetColor();
 
     float GetKs();
     Vector3 GetCs();

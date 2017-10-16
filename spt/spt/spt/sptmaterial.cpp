@@ -76,6 +76,10 @@ Ray Diffuse::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t samp
     return ray;
 }
 
+Vector3 Diffuse::GetColor() {
+    return m_Cd * m_Kd;
+}
+
 //----------------------------------------------------------
 
 Emission::Emission(float ke, Vector3 ce)
@@ -97,6 +101,10 @@ float Emission::GetPDF(Vector3 normal, Vector3 wi) {
 
 Ray Emission::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) {
     return Ray();
+}
+
+Vector3 Emission::GetColor() {
+    return m_Ce * m_Ke;
 }
 
 float Emission::GetKe() {
@@ -133,6 +141,10 @@ Ray PerfectSpecular::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int3
     ray.pos = pos;
     ray.dir = dir;
     return ray;
+}
+
+Vector3 PerfectSpecular::GetColor() {
+    return m_Cs * m_Ks;
 }
 
 float PerfectSpecular::GetKs() {
