@@ -21,6 +21,7 @@ public:
         DIFFUSE,
         EMISSION,
         PERFECTSPECULAR,
+        TRANSPARENT,
     };
 
 public:
@@ -30,8 +31,10 @@ public:
 public:
     int32_t GetType();
     virtual Vector3 GetBRDF() = 0;
+    virtual Vector3 GetBTDF() { return Vector3(0.0f, 0.0f, 0.0f); };
     virtual float GetPDF(Vector3 normal, Vector3 wi) = 0;
     virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) = 0;
+    virtual Ray GetTransimitRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) { return Ray(); };
     virtual Vector3 GetColor() = 0;
 
 protected:
@@ -98,6 +101,39 @@ public:
 protected:
     float       m_Ks;
     Vector3     m_Cs;
+};
+
+//--------------------------------------------------------------
+
+class Transparent : public Material {
+public:
+    Transparent(float ks, Vector3 cs, float ior, float russianRouletteK);
+    virtual ~Transparent();
+
+public:
+    virtual Vector3 GetBRDF();
+    virtual Vector3 GetBTDF();
+    virtual float GetPDF(Vector3 normal, Vector3 wi);
+    virtual Ray GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index);
+    virtual Ray GetTransimitRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index);
+    virtual Vector3 GetColor();
+
+    float GetRussianRouletteK();
+
+public:
+    bool IsTotalInternalReflection(Vector3 normal, Vector3 wi);
+    float GetFrenelFactor(Vector3 normal, Vector3 wi);
+    bool IsInsideTransparent(Vector3 normal, Vector3 wi);
+
+protected:
+    float m_Ks;
+    Vector3 m_Cs;
+    float m_IOR;
+    float m_RussianRouletteK;
+
+    bool m_IsTotalInternalReflection;
+    float m_FrenelFactor;
+    bool m_IsInsideTransparent;
 };
 
 };  // namespace spt

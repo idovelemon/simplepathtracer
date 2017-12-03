@@ -59,11 +59,13 @@ ShadeBlock World::PrimaryTrace(const Ray& r) {
     for (int32_t i = 0; i < size; i++) {
         if (m_Objects[i]->Hit(r, p, n, t)) {
             if (t < min) {
-                min = t;
-                block.SetPos(p);
-                block.SetNormal(n);
-                block.SetObject(m_Objects[i]);
-                block.SetLightDir(r.dir * (-1.0f));
+                if (Vector3::Dot(n, r.dir * (-1.0f)) > 0.0f) {
+                    min = t;
+                    block.SetPos(p);
+                    block.SetNormal(n);
+                    block.SetObject(m_Objects[i]);
+                    block.SetLightDir(r.dir * (-1.0f));
+                }
             }
         }
     }
@@ -86,6 +88,8 @@ ShadeBlock World::SecondaryTrace(const Ray& r, const ShadeBlock& pre) {
     for (int32_t i = 0; i < size; i++) {
         if (m_Objects[i]->Hit(r, p, n, t)) {
             if (t < min) {
+                // Remove this check, assume all material are double face material
+                //if (Vector3::Dot(n, r.dir * (-1.0f)) > 0.0f) {
                 min = t;
                 block.SetPos(p);
                 block.SetNormal(n);

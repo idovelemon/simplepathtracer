@@ -20,7 +20,7 @@ public:
 
 public:
     void GenSamplers();
-    Vector2 GenSamplerInHemiSphere();
+    Vector2 GenSamplerInHemiSphere(int32_t index);
     void MapToDisk();
     void MapToHemiSphere();
 

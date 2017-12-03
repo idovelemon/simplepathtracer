@@ -17,14 +17,15 @@ int main() {
     int SCREEN_WIDTH = 400;
     int SCREEN_HEIGHT = 400;
     int AREA_SAMPLER_NUM = 25;
-    int SAMPLER_NUM = 10000;
+    int SAMPLER_NUM = 100;
 
     spt::World world;
-    //world.SetMaxDepth(50);
+    world.SetMaxDepth(5);
 
     // AreaLight1
     spt::Object* obj = new spt::Object();
-    spt::Disk* disk = new spt::Disk(spt::Vector3(0.0f, 49.9f, 0.0f), spt::Vector3(0.0f, -1.0f, 0.0f), 25.0f, 0.001f);
+    //spt::Disk* disk = new spt::Disk(spt::Vector3(0.0f, 49.9f, 0.0f), spt::Vector3(0.0f, -1.0f, 0.0f), 25.0f, 0.001f);
+    spt::Sphere* disk = new spt::Sphere(spt::Vector3(0.0f, 300.0f, 0.0f), 251.0f, 0.0001f);
     spt::Material* emission = new spt::Emission(10.0f, spt::Vector3(1.0f, 1.0f, 1.0f));
     obj->SetShape(disk);
     obj->SetMaterial(emission);
@@ -39,19 +40,28 @@ int main() {
     spt::Material* diffuse = new spt::Diffuse(0.8f, spt::Vector3(1.0f, 1.0f, 1.0f), SAMPLER_NUM);
     obj->SetShape(sphere);
     obj->SetMaterial(diffuse);
-    world.AddObject(obj);
+    //world.AddObject(obj);
 
     // Perfect Specular sphere
     obj = new spt::Object();
-    sphere = new spt::Sphere(spt::Vector3(25.0f, -30.0f, 0.0f), 20.0f, 0.0001f);
+    sphere = new spt::Sphere(spt::Vector3(-25.0f, -30.0f, 0.0f), 20.0f, 0.0001f);
     spt::Material* perfect = new spt::PerfectSpecular(0.8f, spt::Vector3(1.0f, 1.0f, 1.0f));
     obj->SetShape(sphere);
     obj->SetMaterial(perfect);
+    //world.AddObject(obj);
+
+    // Transparent sphere
+    obj = new spt::Object();
+    sphere = new spt::Sphere(spt::Vector3(0.0f, -30.0f, 0.0f), 20.0f, 0.0001f);
+    spt::Material* transparent = new spt::Transparent(0.8f, spt::Vector3(1.0f, 1.0f, 1.0f), 1.5f, 0.5f);
+    obj->SetShape(sphere);
+    obj->SetMaterial(transparent);
     world.AddObject(obj);
 
     // Box-Down
     obj = new spt::Object();
     spt::Plane* plane = new spt::Plane(spt::Vector3(0.0f, -50.0f, 0.0f), spt::Vector3(0.0f, 1.0f, 0.0f), 0.001f);
+    //sphere = new spt::Sphere(spt::Vector3(0.0f, -1000.0f, 0.0f), 951.0f, 0.0001f);
     diffuse = new spt::Diffuse(0.8f, spt::Vector3(1.0f, 1.0f, 1.0f), SAMPLER_NUM);
     obj->SetShape(plane);
     obj->SetMaterial(diffuse);
@@ -60,6 +70,7 @@ int main() {
     // Box-Left
     obj = new spt::Object();
     plane = new spt::Plane(spt::Vector3(-50.0f, 0.0f, 0.0f), spt::Vector3(1.0f, 0.0f, 0.0f), 0.001f);
+    //sphere = new spt::Sphere(spt::Vector3(-1000.0f, 0.0f, 0.0f), 951.0f, 0.0001f);
     diffuse = new spt::Diffuse(0.8f, spt::Vector3(1.0f, 0.0f, 0.0f), SAMPLER_NUM);
     obj->SetShape(plane);
     obj->SetMaterial(diffuse);
@@ -68,6 +79,7 @@ int main() {
     // Box-Right
     obj = new spt::Object();
     plane = new spt::Plane(spt::Vector3(50.0f, 0.0f, 0.0f), spt::Vector3(-1.0f, 0.0f, 0.0f), 0.001f);
+    //sphere = new spt::Sphere(spt::Vector3(1000.0f, 0.0f, 0.0f), 951.0f, 0.0001f);
     diffuse = new spt::Diffuse(0.8f, spt::Vector3(0.0f, 0.0f, 1.0f), SAMPLER_NUM);
     obj->SetShape(plane);
     obj->SetMaterial(diffuse);
@@ -76,20 +88,35 @@ int main() {
     // Box-Front
     obj = new spt::Object();
     plane = new spt::Plane(spt::Vector3(0.0f, 0.0f, 50.0f), spt::Vector3(0.0f, 0.0f, -1.0f), 0.001f);
+    //sphere = new spt::Sphere(spt::Vector3(0.0f, 0.0f, 1000.0f), 951.0f, 0.0001f);
     diffuse = new spt::Diffuse(0.8f, spt::Vector3(1.0f, 1.0f, 1.0f), SAMPLER_NUM);
     obj->SetShape(plane);
     obj->SetMaterial(diffuse);
     world.AddObject(obj);
+
+    //obj = new spt::Object();
+    //plane = new spt::Plane(spt::Vector3(0.0f, 0.0f, 50.0f), spt::Vector3(0.0f, 0.0f, -1.0f), 0.001f);
+    ////sphere = new spt::Sphere(spt::Vector3(0.0f, 0.0f, 1000.0f), 951.0f, 0.0001f);
+    //perfect = new spt::PerfectSpecular(0.8f, spt::Vector3(1.0f, 1.0f, 1.0f));
+    //obj->SetShape(plane);
+    //obj->SetMaterial(perfect);
+    //world.AddObject(obj);
 
     // Box-Top
     obj = new spt::Object();
     plane = new spt::Plane(spt::Vector3(0.0f, 50.0f, 0.0f), spt::Vector3(0.0f, -1.0f, 0.0f), 0.001f);
+    //sphere = new spt::Sphere(spt::Vector3(0.0f, 1000.0f, 0.0f), 950.0f, 0.0001f);
     diffuse = new spt::Diffuse(0.8f, spt::Vector3(1.0f, 1.0f, 1.0f), SAMPLER_NUM);
     obj->SetShape(plane);
     obj->SetMaterial(diffuse);
     world.AddObject(obj);
 
+#if _DEBUG
+    int process = 1;
+#else
     int process = omp_get_num_procs();
+#endif
+
     float* color_buf = new float[SCREEN_WIDTH * SCREEN_HEIGHT * 3];
 
     #pragma omp parallel for
@@ -102,6 +129,12 @@ int main() {
             SCREEN_WIDTH, SCREEN_HEIGHT,
             color_buf);
     }
+
+    //spt::Camera camera(spt::Vector3(0.0f, 0.0f, -100.0f), spt::Vector3(0.0f, 0.0f, 0.0f),
+    //    1.0f * SCREEN_WIDTH / SCREEN_HEIGHT, 79.0f, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
+    //spt::Sampler sampler(SAMPLER_NUM);
+    //spt::Tracer tracer(&world, &camera, &sampler);
+    //tracer.TraceOnePixel(200, 256, SCREEN_WIDTH, SCREEN_HEIGHT, color_buf);
 
     spt::SaveToBmpFile(color_buf, SCREEN_WIDTH, SCREEN_HEIGHT, "result.bmp");
 

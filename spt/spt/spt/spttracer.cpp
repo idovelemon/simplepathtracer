@@ -59,4 +59,26 @@ void Tracer::Trace(int32_t start_line, int32_t end_line,
     }
 }
 
+void Tracer::TraceOnePixel(int32_t x, int32_t y, int32_t width, int32_t height, float* color_buf) {
+    int32_t sampler_num = m_Sampler->GetSamplerNum();
+
+    Vector3 color(0.0f, 0.0f, 0.0f);
+
+    // Resampling for good image quality
+    m_Sampler->GenSamplers();
+    Vector2* samplers = m_Sampler->GetSamplers();
+    for (int32_t j = 0; j < sampler_num; j++) {
+        Ray ray = m_Camera->GenRay(x, y, samplers[j]);
+        ShadeBlock block = m_World->PrimaryTrace(ray);
+        color = color + block.Shade(j);
+    }
+    color = color * (1.0f / sampler_num);
+    color.x = Clamp(color.x);
+    color.y = Clamp(color.y);
+    color.z = Clamp(color.z);
+    //ToneMapping(color.x, color.y, color.z);
+    SetRGB(color_buf, x, y, width, height, color.x, color.y, color.z);
+    printf("Pos:(%d,%d) Color:(%f,%f,%f)\n", x, y, color.x, color.y, color.z);
+}
+
 };  // namespace spt

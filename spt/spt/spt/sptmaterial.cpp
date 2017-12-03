@@ -47,7 +47,7 @@ float Diffuse::GetPDF(Vector3 normal, Vector3 wi) {
 
 Ray Diffuse::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) {
     // Get sampler point on hemisphere
-    Vector2 sample = m_Sampler.GenSamplerInHemiSphere();
+    Vector2 sample = m_Sampler.GenSamplerInHemiSphere(sampler_index);
 
     // Calculate orthogonal basie
     Vector3 w = normal;
@@ -66,13 +66,12 @@ Ray Diffuse::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t samp
     float pv = sin_theta * sin_phi;
     float pw = cos_theta;
 
-    Vector3 target = pos + u * pu + v * pv + w * pw;
-
     // Build the reflect ray
     Ray ray;
     ray.pos = pos;
-    ray.dir = (target - pos);
+    ray.dir = u * pu + v * pv + w * pw;
     ray.dir.Normalize();
+
     return ray;
 }
 
@@ -140,6 +139,7 @@ Ray PerfectSpecular::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int3
     Ray ray;
     ray.pos = pos;
     ray.dir = dir;
+
     return ray;
 }
 
@@ -153,5 +153,115 @@ float PerfectSpecular::GetKs() {
 
 Vector3 PerfectSpecular::GetCs() {
     return m_Cs;
+}
+
+//----------------------------------------------------------
+
+Transparent::Transparent(float ks, Vector3 cs, float ior, float russianRouletteK)
+: Material(Material::TRANSPARENT, 0)
+, m_Ks(ks)
+, m_Cs(cs)
+, m_IOR(ior)
+, m_RussianRouletteK(russianRouletteK)
+
+, m_IsTotalInternalReflection(false)
+, m_FrenelFactor(0.0f)
+, m_IsInsideTransparent(false) {
+}
+
+Transparent::~Transparent() {
+}
+
+Vector3 Transparent::GetBRDF() {
+    return m_Cs * m_Ks;
+}
+
+Vector3 Transparent::GetBTDF() {
+    return m_Cs * m_Ks;
+}
+
+float Transparent::GetPDF(Vector3 normal, Vector3 wi) {
+    return Vector3::Dot(normal, wi);
+}
+
+Ray Transparent::GetReflectRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) {
+    Vector3 dir = normal * (Vector3::Dot(wi, normal) * 2.0f) - wi;
+    dir.Normalize();
+    Ray ray;
+    ray.pos = pos;
+    ray.dir = dir;
+
+    return ray;
+}
+
+Ray Transparent::GetTransimitRay(Vector3 pos, Vector3 normal, Vector3 wi, int32_t sampler_index) {
+    const float indexOfRefractOfAir = 1.0f;
+    float ior = m_IOR / indexOfRefractOfAir;
+    if (IsInsideTransparent(normal, wi)) {
+        normal = normal * (-1.0f);
+        ior = indexOfRefractOfAir / m_IOR;
+    }
+
+    wi = wi * (-1.0f);
+    float ci = Vector3::Dot(wi, normal);
+    float ct = sqrt(1.0f - (1.0 - ci * ci) / (ior * ior));
+    Ray ray;
+    ray.pos = pos;
+
+    ray.dir = wi * (1.0f / ior) - normal * (ct + 1.0f * ci / ior);
+    ray.dir.Normalize();
+
+    return ray;
+}
+
+Vector3 Transparent::GetColor() {
+    return m_Cs * m_Ks;
+}
+
+float Transparent::GetRussianRouletteK() {
+    return m_RussianRouletteK;
+}
+
+bool Transparent::IsTotalInternalReflection(Vector3 normal, Vector3 wi) {
+    const float indexOfRefractOfAir = 1.0f;
+    float ior = m_IOR / indexOfRefractOfAir;
+    if (IsInsideTransparent(normal, wi)) {
+        normal = normal * (-1.0f);
+        ior = indexOfRefractOfAir / m_IOR;
+    }
+
+    bool result = false;
+    float ior_inv = 1.0f / ior;
+    wi = wi * (-1.0f);
+    float c = Vector3::Dot(normal, wi);
+    if (1.0f - ior_inv * ior_inv * (1.0f - c * c) < 0.0f) {
+        result = true;
+    }
+
+    return result;
+}
+
+float Transparent::GetFrenelFactor(Vector3 normal, Vector3 wi) {
+    if (IsInsideTransparent(normal, wi)) {
+        normal = normal * (-1.0f);
+    }
+
+    const float indexOfRefractOfAir = 1.0f;
+    float a = m_IOR - indexOfRefractOfAir;
+    float b = m_IOR + indexOfRefractOfAir;
+    float R0 = a * a / (b * b);
+    float c = Vector3::Dot(normal, wi);
+    c = 1.0f - c;
+    return R0 + (1.0f - R0) * c * c * c * c * c;
+}
+
+bool Transparent::IsInsideTransparent(Vector3 normal, Vector3 wi) {
+    bool result = false;
+
+    if (Vector3::Dot(normal, wi) < 0.0f) {
+        result = true;
+    }
+
+    return result;
 }
 };  // namespace spt

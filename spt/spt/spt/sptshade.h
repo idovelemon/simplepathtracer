@@ -28,7 +28,9 @@ public:
     int32_t GetDepth() const;
     void SetPos(Vector3 pos);
     void SetNormal(Vector3 normal);
+    Vector3 GetNormal();
     void SetLightDir(Vector3 dir);
+    Vector3 GetLightDir();
     void SetObject(Object* obj);
     void SetWorld(World* world);
 

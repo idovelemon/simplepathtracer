@@ -54,8 +54,8 @@ void Sampler::GenSamplers() {
             int32_t row = row_lists[i][rand() % (row_lists[i].size())];
             float x = j * t + col;
             float y = i * t + row;
-            x = x * step + (rand() % 100 / 100.0f) * step;
-            y = y * step + (rand() % 100 / 100.0f) * step;
+            x = x * step + DRand48() * step;
+            y = y * step + DRand48() * step;
             m_Samplers[sampler_index] = Vector2(x, y);
             sampler_index++;
             col_lists[j].erase(std::find(col_lists[j].begin(), col_lists[j].end(), col));
@@ -64,12 +64,12 @@ void Sampler::GenSamplers() {
     }
 }
 
-Vector2 Sampler::GenSamplerInHemiSphere() {
+Vector2 Sampler::GenSamplerInHemiSphere(int32_t index) {
     Vector2 sampler;
-    sampler.x = rand() % 100 / 100.0f;
-    sampler.y = rand() % 100 / 100.0f;
+    sampler.x = DRand48();
+    sampler.y = DRand48();
     sampler.x = 2 * 3.141592f * sampler.x;
-    float t = pow(1 - sampler.y, 0.5f);
+    float t = pow(1.0f - sampler.y, 0.5f);
     sampler.y = acos(t);
     return sampler;
 }

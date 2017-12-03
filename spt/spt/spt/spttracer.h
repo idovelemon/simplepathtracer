@@ -24,6 +24,7 @@ public:
     void Trace(int32_t start_line, int32_t end_line,
         int32_t width, int32_t height,
         float* color_buf);
+    void TraceOnePixel(int32_t x, int32_t y, int32_t width, int32_t height, float* color_buf);
 
 private:
     Camera*     m_Camera;

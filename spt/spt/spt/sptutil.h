@@ -7,12 +7,24 @@
 #ifndef _SPT_SPTUTIL_H_
 #define _SPT_SPTUTIL_H_
 
-#include <stdint.h>
-
 #include <Windows.h>
 #include <wingdi.h>
 
+#include <stdint.h>
+
 namespace spt {
+
+#define m 0x100000000LL
+#define c 0xB16
+#define a 0x5DEECE66DLL
+
+static unsigned long long seed = 1;
+
+inline double DRand48(void) {
+    seed = (a * seed + c) & 0xFFFFFFFFFFFFLL;
+    unsigned int x = seed >> 16;
+    return  ((double)x / (double)m);
+}
 
 inline float Clamp(float v, float s = 0.0f, float e = 1.0f) {
     if (v < s) {
